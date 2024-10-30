@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Waste Tracking System</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #qrcode {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #qrcode img {
+            max-width: 100%;
+            height: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+        .scan-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                margin-bottom: 15px;
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+            }
+            td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Plastic Waste Tracking</h1>
+        <nav>
+            <ul>
+                <li><a href="#generate">Generate QR</a></li>
+                <li><a href="#scan">Scan QR</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <section id="generate">
+                <h2>Generate QR Code</h2>
+                <form id="qrForm">
+                    <input type="text" id="batchId" placeholder="Batch ID" required>
+                    <input type="text" id="plasticType" placeholder="Plastic Type" required>
+                    <input type="number" id="weight" placeholder="Weight (kg)" required>
+                    <button type="submit">Generate QR Code</button>
+                </form>
+                <div id="qrcode"></div>
+            </section>
+            
+            <section id="scan">
+                <h2>Scan QR Code</h2>
+                <div class="scan-section">
+                    <h3>Collection</h3>
+                    <form class="scanForm" data-stage="collection">
+                        <input type="text" class="scannedData" placeholder="Scanned QR Code Data" required>
+                        <button type="submit">Update Collection Status</button>
+                    </form>
+                </div>
+                <div class="scan-section">
+                    <h3>Processing</h3>
+                    <form class="scanForm" data-stage="processing">
+                        <input type="text" class="scannedData" placeholder="Scanned QR Code Data" required>
+                        <button type="submit">Update Processing Status</button>
+                    </form>
+                </div>
+                <div class="scan-section">
+                    <h3>Storage</h3>
+                    <form class="scanForm" data-stage="storage">
+                        <input type="text" class="scannedData" placeholder="Scanned QR Code Data" required>
+                        <button type="submit">Update Storage Status</button>
+                    </form>
+                </div>
+                <div class="scan-section">
+                    <h3>Dispatch</h3>
+                    <form class="scanForm" data-stage="dispatch">
+                        <input type="text" class="scannedData" placeholder="Scanned QR Code Data" required>
+                        <button type="submit">Update Dispatch Status</button>
+                    </form>
+                </div>
+            </section>
+            
+            <section id="dashboard">
+                <h2>Batch Status Dashboard</h2>
+                <table id="dashboardTable">
+                    <thead>
+                        <tr>
+                            <th>Batch ID</th>
+                            <th>Plastic Type</th>
+                            <th>Weight (kg)</th>
+                            <th>Current Stage</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Plastic Waste Tracking System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Simulated database
+        let batches = [];
+
+        // Generate QR Code
+        document.getElementById('qrForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const batchId = document.getElementById('batchId').value;
+            const plasticType = document.getElementById('plasticType').value;
+            const weight = document.getElementById('weight').value;
+            const data = `${batchId}|${plasticType}|${weight}`;
+            
+            const qr = qrcode(0, 'M');
+            qr.addData(data);
+            qr.make();
+            document.getElementById('qrcode').innerHTML = qr.createImgTag(5);
+            
+            // Add to simulated database
+            batches.push({ batchId, plasticType, weight, stage: 'collection' });
+            updateDashboard();
+        });
+
+        // Scan QR Code and Update Status for all stages
+        document.querySelectorAll('.scanForm').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const scannedData = this.querySelector('.scannedData').value;
+                const stage = this.dataset.stage;
+                
+                const [batchId, plasticType, weight] = scannedData.split('|');
+                const batchIndex = batches.findIndex(b => b.batchId === batchId);
+                
+                if (batchIndex !== -1) {
+                    batches[batchIndex].stage = stage;
+                    alert(`Batch ${batchId} updated to ${stage} stage.`);
+                } else {
+                    batches.push({ batchId, plasticType, weight, stage });
+                    alert(`New batch ${batchId} added at ${stage} stage.`);
+                }
+                
+                updateDashboard();
+            });
+        });
+
+        // Update Dashboard
+        function updateDashboard() {
+            const tbody = document.querySelector('#dashboardTable tbody');
+            tbody.innerHTML = '';
+            batches.forEach(batch => {
+                const row = tbody.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+                
+                cell1.textContent = batch.batchId;
+                cell2.textContent = batch.plasticType;
+                cell3.textContent = batch.weight;
+                cell4.textContent = batch.stage;
+                
+                // Add data-label attribute for mobile responsiveness
+                cell1.setAttribute('data-label', 'Batch ID');
+                cell2.setAttribute('data-label', 'Plastic Type');
+                cell3.setAttribute('data-label', 'Weight (kg)');
+                cell4.setAttribute('data-label', 'Current Stage');
+            });
+        }
+    </script>
+</body>
+</html>
